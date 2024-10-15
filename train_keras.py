@@ -1,5 +1,6 @@
-import numpy as np
+import time
 import keras
+import numpy as np
 from keras import layers
 from sklearn.metrics import classification_report
 
@@ -9,6 +10,7 @@ input_shape = (28, 28, 1)
 
 # Load the data and split it between train and test sets
 (x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
+#(x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
 
 # Scale images to the [0, 1] range
 x_train = x_train.astype("float32") / 255
@@ -44,15 +46,26 @@ epochs = 20
 model.compile(loss="categorical_crossentropy", optimizer="adam",
               metrics=["accuracy"])
 
+startTime_train = time.time()
+
+# model training
 model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs,
           validation_split=0.1)
 
-y_pred = model.predict(x_test)
+endTime_train = time.time()
+print("Time for training: {:.2f}".format(endTime_train-startTime_train))
 
-#transform predicitons into onehot coding
+# model test
+startTime_test = time.time()
+y_pred = model.predict(x_test)
+endTime_test = time.time()
+print("time to test: {:.2f}".format(endTime_test-startTime_test))
+
+# transform predicitons into one-hot-coding for evaluation
 for i in range(len(y_pred)):
     max_index = np.argmax(y_pred[i])
     y_pred[i] = np.zeros_like(y_pred[i])
     y_pred[i][max_index] = 1
 
+# evaluation
 print(classification_report(y_test, y_pred))
