@@ -3,6 +3,8 @@ import keras
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.metrics import classification_report
+import matplotlib.pyplot as plt
+import math
 
 TOTAL_CLUSTERS = 384
 
@@ -35,7 +37,21 @@ test_clusters = kmeans.predict(x_test)
 endTime_test = time.time()
 print("time to test: {:.2f}".format(endTime_test-startTime_test))
 
-
 test_predictions = common_labels[test_clusters]
 
 print(classification_report(y_test, test_predictions))
+
+# Plotting the centroids
+centroids = kmeans.cluster_centers_.reshape(TOTAL_CLUSTERS, 28, 28)
+
+figs_to_show = 10 # Number of centroids to show
+rows = math.ceil(math.sqrt(figs_to_show))
+cols = math.ceil(figs_to_show / rows)
+
+plt.figure(figsize=(28,28))
+for i in range(figs_to_show):
+    plt.subplot(rows, cols, i + 1)
+    plt.imshow(centroids[i], cmap='gray')
+    plt.title(f'Label: {int(common_labels[i])}')
+    plt.axis('off')
+plt.show()
