@@ -44,14 +44,17 @@ print(classification_report(y_test, test_predictions))
 # Plotting the centroids
 centroids = kmeans.cluster_centers_.reshape(TOTAL_CLUSTERS, 28, 28)
 
-figs_to_show = 10 # Number of centroids to show
+figs_to_show = 16 # Number of centroids to show
 rows = math.ceil(math.sqrt(figs_to_show))
 cols = math.ceil(figs_to_show / rows)
 
-plt.figure(figsize=(28,28))
+plt.figure(figsize=(28, 28))
+plt.suptitle(f'{figs_to_show} Centroids out of {TOTAL_CLUSTERS} total', fontsize=50, y=0.92)
+plt.axis('off')
 for i in range(figs_to_show):
     plt.subplot(rows, cols, i + 1)
     plt.imshow(centroids[i], cmap='gray')
-    plt.title(f'Label: {int(common_labels[i])}')
-    plt.axis('off')
-plt.show()
+    plt.title(f'Label: {int(common_labels[i])}', fontsize=30)  # Set the fontsize here
+    plt.axis('off')  # Remove axes for subplots
+plt.savefig(f'centroids({figs_to_show}-out-of{TOTAL_CLUSTERS}).png')
+#plt.show()
