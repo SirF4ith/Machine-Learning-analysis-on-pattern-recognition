@@ -2,7 +2,8 @@ import time
 import keras
 import numpy as np
 from keras import layers
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, multilabel_confusion_matrix, ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
 
 # Model / data parameters
 num_classes = 10
@@ -53,13 +54,13 @@ model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs,
           validation_split=0.1)
 
 endTime_train = time.time()
-print("Time for training: {:.2f}".format(endTime_train-startTime_train))
+print("Time for training: {:.2f} seconds".format(endTime_train-startTime_train))
 
 # model test
 startTime_test = time.time()
 y_pred = model.predict(x_test)
 endTime_test = time.time()
-print("time to test: {:.2f}".format(endTime_test-startTime_test))
+print("time to test: {:.2f} seconds".format(endTime_test-startTime_test))
 
 # transform predicitons into one-hot-coding for evaluation
 for i in range(len(y_pred)):
@@ -69,3 +70,27 @@ for i in range(len(y_pred)):
 
 # evaluation
 print(classification_report(y_test, y_pred))
+
+# Plotting multilabel confusion matrices
+confusion_matrices = multilabel_confusion_matrix(y_test.argmax(axis=1), y_pred.argmax(axis=1))
+
+fig, axes = plt.subplots(2, 5, figsize=(25, 15))
+axes = axes.ravel()
+
+for i, cm in enumerate(confusion_matrices):
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+    disp.plot(ax=axes[i], values_format='d')
+    axes[i].set_title(f'Ziffer {i}', fontsize=25)
+    disp.im_.colorbar.remove()
+    axes[i].set_xlabel('Predicted label', fontsize=13)
+    axes[i].set_ylabel('True label', fontsize=13)
+
+    for text in disp.text_.ravel():
+        text.set_fontsize(20)
+
+plt.subplots_adjust(wspace=0.20, hspace=0.1)
+fig.colorbar(disp.im_, ax=axes, fraction=0.02, pad=0.04)
+plt.suptitle('Multilabel Confusion Matrizen für CNN', fontsize=50)
+
+plt.savefig('confusion_matrix_cnn.png', bbox_inches='tight')
+plt.show()
